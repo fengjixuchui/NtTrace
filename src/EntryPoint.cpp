@@ -6,7 +6,7 @@ DESCRIPTION
     Handle a single entry point for NtTrace
 
 COPYRIGHT
-    Copyright (C) 2002, 2019 by Roger Orr <rogero@howzatt.demon.co.uk>
+    Copyright (C) 2002, 2019 by Roger Orr <rogero@howzatt.co.uk>
 
     This software is distributed in the hope that it will be useful, but
     without WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +19,10 @@ COPYRIGHT
     by this notice.
 
     Comments and suggestions are always welcome.
-    Please report bugs to rogero@howzatt.demon.co.uk.
+    Please report bugs to rogero@howzatt.co.uk.
 */
 
-static char const szRCSID[] = "$Id: EntryPoint.cpp 1816 2019-03-18 22:43:29Z Roger $";
+static char const szRCSID[] = "$Id: EntryPoint.cpp 1948 2020-12-21 14:14:17Z roger $";
 
 #pragma warning( disable: 4786 ) // identifier was truncated to '255' characters
 
@@ -243,6 +243,10 @@ void Argument::showArgument(std::ostream & os, HANDLE hProcess, ARG argVal, bool
         showBoolean( os, (BOOLEAN)argVal );
         break;
 
+    case argBYTE:
+        showDword( os, (BYTE)argVal );
+        break;
+
     case argPOINTER:
         showPointer( os, hProcess, argVal);
         break;
@@ -257,6 +261,10 @@ void Argument::showArgument(std::ostream & os, HANDLE hProcess, ARG argVal, bool
 
     case argPHANDLE:
         showPHandle( os, hProcess, argVal);
+        break;
+
+    case argPBYTE:
+        showPByte( os, hProcess, argVal);
         break;
 
     case argPUSHORT:
@@ -679,6 +687,8 @@ void EntryPoint::setArgument( int argNum, std::string const & argType,
 
       { argULONGLONG, "ULONGLONG" },
 
+      { argBYTE, "BYTE" },
+
       { argENUM, "ALPC_MESSAGE_INFORMATION_CLASS" },
       { argENUM, "ALPC_PORT_INFORMATION_CLASS" },
       { argENUM, "ATOM_INFORMATION_CLASS" },
@@ -734,14 +744,15 @@ void EntryPoint::setArgument( int argNum, std::string const & argType,
       { argACCESS_MASK, "ACCESS_MASK" },
 
       { argPOINTER, "PVOID" },
-      { argPOINTER, "PBYTE" },
       { argPOINTER, "PSTR" },
-      { argPOINTER, "PUCHAR" },
       { argPOINTER, "PWSTR" },
 
       { argPHANDLE, "PHANDLE" },
       { argPHANDLE, "PPVOID" },
       { argPHANDLE, "PSIZE_T" },
+
+      { argPBYTE, "PBYTE" },
+      { argPBYTE, "PUCHAR" },
 
       { argPUSHORT, "PUSHORT" },
       { argPUSHORT, "PWORD" },

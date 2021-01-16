@@ -6,7 +6,7 @@ DESCRIPTION
     Additional symbol engine functionality
 
 COPYRIGHT
-    Copyright (C) 2003 by Roger Orr <rogero@howzatt.demon.co.uk>
+    Copyright (C) 2003 by Roger Orr <rogero@howzatt.co.uk>
 
     This software is distributed in the hope that it will be useful, but
     without WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +19,10 @@ COPYRIGHT
     by this notice.
 
     Comments and suggestions are always welcome.
-    Please report bugs to rogero@howzatt.demon.co.uk.
+    Please report bugs to rogero@howzatt.co.uk.
 */
 
-static char const szRCSID[] = "$Id: SymbolEngine.cpp 1603 2016-02-15 22:24:56Z Roger $";
+static char const szRCSID[] = "$Id: SymbolEngine.cpp 1915 2020-08-15 14:23:23Z Roger $";
 
 #ifdef _MSC_VER
 #pragma warning( disable: 4786 ) // identifier was truncated to '255' chars
@@ -675,13 +675,19 @@ void SymbolEngine::showMsvcThrow( std::ostream &os, PVOID throwInfo, PVOID base 
     }
 
     const std::type_info *pType_info = (const std::type_info *)raw_type_info;
+    const char *decorated_name = pType_info->raw_name();
 
     char buffer[ 1024 ] = ""; 
-    if ( UnDecorateSymbolName( pType_info->raw_name() + 1, buffer, sizeof( buffer ),
-         UNDNAME_32_BIT_DECODE | UNDNAME_NO_ARGUMENTS ) )
+    if ((decorated_name[0] == '.') &&
+         UnDecorateSymbolName( decorated_name + 1, buffer, sizeof( buffer ),
+           UNDNAME_32_BIT_DECODE | UNDNAME_NO_ARGUMENTS ) )
     { 
         os << " (" << buffer << ")"; 
-    } 
+    }
+    else
+    {
+        os << " (" << decorated_name << ")";
+    }
 }
 
 // Helper for ReadProcessMemory

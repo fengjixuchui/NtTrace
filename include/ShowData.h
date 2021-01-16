@@ -5,7 +5,7 @@
 
     Functions to handle showing data from another process
 
-        @author Roger Orr <rogero@howzatt.demon.co.uk>
+        @author Roger Orr <rogero@howzatt.co.uk>
 
     Copyright &copy; 2002, 2013.
     This software is distributed in the hope that it will be useful, but
@@ -19,12 +19,12 @@
     by this notice.
 
     Comments and suggestions are always welcome.
-    Please report bugs to rogero@howzatt.demon.co.uk.
+    Please report bugs to rogero@howzatt.co.uk.
 
-    $Revision: 1609 $
+    $Revision: 1948 $
 */
 
-// $Id: ShowData.h 1609 2016-02-16 21:31:39Z Roger $
+// $Id: ShowData.h 1948 2020-12-21 14:14:17Z roger $
 
 #include <windows.h>
 #include <ostream>
@@ -70,6 +70,9 @@ namespace showData
 
     /** show a pointer to handle from the debuggee */
     void showPHandle( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal );
+
+    /** show a pointer to BYTE from the debuggee */
+    void showPByte( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal );
 
     /** show a pointer to USHORT from the debuggee */
     void showPUshort( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal );

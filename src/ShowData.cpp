@@ -6,7 +6,7 @@ DESCRIPTION
     Class to handle showing data from another process
 
 COPYRIGHT
-    Copyright (C) 2002, 2015 by Roger Orr <rogero@howzatt.demon.co.uk>
+    Copyright (C) 2002, 2015 by Roger Orr <rogero@howzatt.co.uk>
 
     This software is distributed in the hope that it will be useful, but
     without WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +19,10 @@ COPYRIGHT
     by this notice.
 
     Comments and suggestions are always welcome.
-    Please report bugs to rogero@howzatt.demon.co.uk.
+    Please report bugs to rogero@howzatt.co.uk.
 */
 
-static char const szRCSID[] = "$Id: ShowData.cpp 1610 2016-02-16 21:34:41Z Roger $";
+static char const szRCSID[] = "$Id: ShowData.cpp 1948 2020-12-21 14:14:17Z roger $";
 
 #pragma warning( disable: 4786 ) // identifier was truncated to '255' characters
 
@@ -30,6 +30,7 @@ static char const szRCSID[] = "$Id: ShowData.cpp 1610 2016-02-16 21:34:41Z Roger
 #include "Enumerations.h"
 
 #include <windows.h>
+#include <DbgHelp.h>
 
 #include <iomanip>
 #include <map>
@@ -328,6 +329,21 @@ void showPHandle( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal )
 }
 
 //////////////////////////////////////////////////////////////////////////
+void showPByte( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal )
+{
+    showPointer(os, hProcess, argVal);
+    if (argVal)
+    {
+        BYTE value = 0;
+        (void)readHelper(hProcess, (LPVOID)argVal, value);
+
+        os << " [";
+        showDword(os, value);
+        os << "]";
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
 void showPUshort( std::ostream & os, HANDLE hProcess, ULONG_PTR argVal )
 {
     showPointer(os, hProcess, argVal);
@@ -525,7 +541,7 @@ void showFileAttributes( std::ostream & os, ULONG argVal )
 }
 
 //////////////////////////////////////////////////////////////////////////
-// note: file times are not returned by the commonest Api, NtQueryInformationFile ... 
+// note: file times are not returned by the commonest Api, NtQueryInformationFile ...
 void showPFileBasicInfo( std::ostream & os, HANDLE hProcess, PFILE_BASIC_INFORMATION pFileBasicInfo )
 {
     showPointer(os, hProcess, (ULONG_PTR)pFileBasicInfo);
@@ -621,11 +637,19 @@ void showThrowType( std::ostream & os, HANDLE hProcess, ULONG_PTR throwInfo, ULO
     memset( type_info + sizeof( PVOID ), 0, sizeof( PVOID ) );
 
     const std::type_info *pType_info = (const std::type_info *)type_info;
-    const char* pName = pType_info->name();
-    os << " type: " << pName;
+    const char *decorated_name = pType_info->raw_name();
 
-    // bit of a fudge: msvc allocates type_info name on first use and therefore we must destroy it.
-    free( const_cast<char*>( pName ) );
+    char buffer[ 1024 ] = "";
+    if ((decorated_name[0] == '.') &&
+         UnDecorateSymbolName( decorated_name + 1, buffer, sizeof( buffer ),
+           UNDNAME_32_BIT_DECODE | UNDNAME_NO_ARGUMENTS ) )
+    {
+      os << " type: " << buffer;
+    }
+    else
+    {
+      os << " raw type: " << decorated_name;
+    }
 }
 
 
