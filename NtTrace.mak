@@ -1,12 +1,11 @@
-# $Id: NtTrace.mak 1927 2020-10-24 19:22:38Z roger $
+# $Id: NtTrace.mak 2335 2022-10-15 22:14:44Z Roger $
 
 #
-# This makefile requires Microsoft Visual Studio 2005 and above,
-# for dbghelp.h and the support for manifest files
+# This makefile requires Microsoft Visual Studio 2010 and above,
 #
 
 # COPYRIGHT
-#     Copyright (C) 2007,2015 by Roger Orr <rogero@howzatt.co.uk>
+#     Copyright (C) 2007,2021 by Roger Orr <rogero@howzatt.co.uk>
 # 
 #     This software is distributed in the hope that it will be useful, but
 #     without WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,10 +32,10 @@ $(BUILD) :
 	mkdir $(BUILD)
 
 clean :
-	@-del NtTrace.exe NtTrace.exe.manifest NtTrace.res *.pdb
+	@-del NtTrace.exe NtTrace.res *.pdb
 	@-rd /q /s $(BUILD)
 
-CCFLAGS = /nologo /MD /W3 /WX /Zi /Iinclude /D_CRT_SECURE_NO_WARNINGS
+CCFLAGS = /nologo /MD /W3 /WX /Zi /Iinclude /D_CRT_SECURE_NO_WARNINGS /I "$(VSINSTALLDIR)\DIA SDK\include"
 LINKFLAGS = /link /opt:ref,icf
 
 {src}.cpp{$(BUILD)}.obj::
@@ -47,7 +46,6 @@ LINKFLAGS = /link /opt:ref,icf
 
 NtTrace.exe : $(BUILD)\$(*B).obj $(*B).res 
 	cl $(CCFLAGS) /Fe$@ $** $(LINKFLAGS)
-	if exist $(@).manifest mt.exe -nologo -manifest $(@).manifest -outputresource:$@
 
 # Dependencies
 
@@ -81,6 +79,7 @@ $(BUILD)\EntryPoint.obj : \
 	"include\displayError.inl" \
 	"include\DbgHelper.h" \
 	"include\DbgHelper.inl" \
+	"include\NtDllStruct.h" \
 	"include\SymbolEngine.h" \
 	"include\TrapNtOpcodes.h" \
 	"include\ShowData.h"
@@ -89,6 +88,7 @@ $(BUILD)\ShowData.obj: \
 	"include\Enumerations.h" \
 	"include\NtDllStruct.h" \
 	"include\MsvcExceptions.h" \
+	"include\ProcessInfo.h" \
 	"include\ReadPartialMemory.h" \
 	"include\ShowData.h"
 
@@ -99,5 +99,4 @@ $(BUILD)\SymbolEngine.obj: \
 	"include/DbgHelper.h" \
 	"include/DbgHelper.inl" \
 	"include/StrFromWchar.h" \
-	"include/MSvcExceptions.h" \
-	"include/BasicType.h"
+	"include/MSvcExceptions.h"
